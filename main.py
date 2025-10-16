@@ -1,43 +1,50 @@
 import hid
 import math
 import time
+import tkinter as tk
+import threading as th
+from colorama import Fore, Style
+
 
 # local library's
 import utils
 
+class Ds4:
+    def __init__(self):
+        """Initialize Ds4 class"""
+        self.root = tk.Tk()
+        
+        self.root.resizable(False, False)
+        self.root.geometry("760x386")
+        self.root.title("DS4MENU |⭐")
+        self.root.config(bg="#000122")
+        
+        self.main_gui_th = th.Thread(
+            target = self.main_gui
+        ); self.main_gui_th.daemon = True
+    
+    def run(self):
+        """Run function from Ds4 class."""
+        self.main_gui_th.start()
+        self.root.mainloop()
+    
+    def main_gui(self):
+        """GUI Function that handles **most** interface features"""
+        self.lbl_choose_device = tk.Label(
+            self.root
+        ); self.lbl.place(x=25,y=25, width=60, height=20)
+    
+    def stop(self, code=0):
+        """Exit?? (idfk its literally just exit() func)"""
+        exit(code)
+
 def main():
-    devices = utils.list_devices()
-    if not devices:
-        print("No HID devices found.")
-        return
-
-    idx_input = input("Choose device index to open (or 'q' to quit): ").strip()
-    if idx_input.lower() == 'q':
-        return
-
-    try:
-        idx = int(idx_input)
-    except ValueError:
-        print("Invalid index")
-        return
-    if idx < 0 or idx >= len(devices):
-        print("Index out of range")
-        return
-
-    dev = utils.open_device_by_index(devices, idx)
-    print("Device opened. Manufacturer:", dev.get_manufacturer_string(), "Product:", dev.get_product_string())
-
-    print("Starting rainbow LED effect. Press Ctrl+C to stop.")
-    try:
-        i = 0
-        while True:
-            r, g, b = utils.rainbow_color(i)
-            utils.send_led_report(dev, r, g, b)
-            time.sleep(0.01)
-            i += 1
-    except KeyboardInterrupt:
-        print("\nStopping rainbow effect...")
-        dev.close()
+    # add whatever here
+    ds4 = Ds4()
+    ds4.run()
+    
+    # wait until user closes
+    while 1: time.sleep(1) 
 
 if __name__ == "__main__":
     main()
