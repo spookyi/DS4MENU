@@ -5,9 +5,15 @@ import tkinter as tk
 import threading as th
 from colorama import Fore, Style
 
-
 # local library's
+import ds4utils
 import utils
+
+# adding const
+INVIS_COL = "#000001"
+
+# other variables
+bg_col = "#000122"
 
 class Ds4:
     def __init__(self):
@@ -17,7 +23,8 @@ class Ds4:
         self.root.resizable(False, False)
         self.root.geometry("760x386")
         self.root.title("DS4MENU |⭐")
-        self.root.config(bg="#000122")
+        self.root.config(bg=bg_col)
+        self.root.wm_attributes("-transparentcolor", INVIS_COL)
         
         self.main_gui_th = th.Thread(
             target = self.main_gui
@@ -30,9 +37,8 @@ class Ds4:
     
     def main_gui(self):
         """GUI Function that handles **most** interface features"""
-        self.lbl_choose_device = tk.Label(
-            self.root
-        ); self.lbl.place(x=25,y=25, width=60, height=20)
+        self.lbl_choose_device = tk.Label(self.root, font=utils.FNT_FUTURA.c16, bg=bg_col, fg="white")
+        self.lbl_choose_device.place(x=25,y=25, width=90, height=90)
     
     def stop(self, code=0):
         """Exit?? (idfk its literally just exit() func)"""
