@@ -1,5 +1,6 @@
 # DS4MENU ⭐
 
+![alt text](https://www.worten.pt/i/d9e2c98dbba48ad596ff8ede706b1f23268c1495)
 DS4MENU is a python-based project where you can mod and customize your DualShock4 Controller.
 
 # Installation
