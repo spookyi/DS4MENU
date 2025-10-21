@@ -1,43 +1,163 @@
 import hid
 import math
 import time
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+import threading as th
+from colorama import Fore, Style
 
 # local library's
+import ds4utils
 import utils
 
-def main():
-    devices = utils.list_devices()
-    if not devices:
-        print("No HID devices found.")
-        return
+# adding const
+INVIS_COL = "#000001"
 
-    idx_input = input("Choose device index to open (or 'q' to quit): ").strip()
-    if idx_input.lower() == 'q':
-        return
+# other variables
+currentdevice = None
+bg_col = "#000122"
 
-    try:
-        idx = int(idx_input)
-    except ValueError:
-        print("Invalid index")
-        return
-    if idx < 0 or idx >= len(devices):
-        print("Index out of range")
-        return
+# functions for bind events
+def on_select_choose_device(event):
+    cb = event.widget
+    
+    devices = hid.enumerate()
+    for _, device in enumerate(devices):
+        product = device.get("product_string") or "N/A"
+        manufacturer = device.get("manufacturer_string") or "N/A"
+        _this = f"{manufacturer} - {product}"
+        
+        if cb.get() == _this:
+            path = device.get("path")
+            if isinstance(path, str):
+                path.encode()
+            
+            currentdevice = hid.device()
+            currentdevice.open_path(path)
+            messagebox.showinfo("-- DS4MENU", "Connected to: %s" % (_this))
+            return
+    
+    messagebox.showerror("--DS4MENU", "Couldnt connect to %s" % (_this))
+        
+    cb.selection_clear()
+    cb.icursor(tk.END)
+    cb.master.focus_set()
+    
+    
 
-    dev = utils.open_device_by_index(devices, idx)
-    print("Device opened. Manufacturer:", dev.get_manufacturer_string(), "Product:", dev.get_product_string())
+class Ds4:
+    def __init__(self):
+        """Initialize Ds4 class"""
+        self.root = tk.Tk()
+        
+        self.root.resizable(False, False)
+        self.root.geometry("760x386")
+        self.root.title("DS4MENU |⭐")
+        self.root.config(bg=bg_col)
+        self.root.wm_attributes("-transparentcolor", INVIS_COL)
+        
+        self.main_gui_th = th.Thread(
+            target = self.main_gui
+        ); self.main_gui_th.daemon = True
+    
+    def run_gui(self):
+        """Run function from Ds4 class."""
+        # setup WM_FUNC
+        self.root.protocol("WM_DELETE_WINDOW", self.destroy)
 
-    print("Starting rainbow LED effect. Press Ctrl+C to stop.")
-    try:
-        i = 0
-        while True:
-            r, g, b = utils.rainbow_color(i)
-            utils.send_led_report(dev, r, g, b)
-            time.sleep(0.01)
-            i += 1
-    except KeyboardInterrupt:
-        print("\nStopping rainbow effect...")
-        dev.close()
+        # everything else lol
+        self.main_gui_th.start()
+        self.root.mainloop()
+    
+    def main_gui(self):
+        """GUI Function that handles **most** interface features"""
+        self.lbl_choose_device = tk.Label(
+            self.root,
+            font=utils.FNT_FUTURA.c14,
+            bg=bg_col,
+            text="Choose Controller",
+            fg="#FFFFFF"
+        ); self.lbl_choose_device.place(
+            x=15, y=15, width=180, height=90
+        )
+        
+        self.drop_choose_device = ttk.Combobox(
+            self.root,
+            values= ["Hello", "Twin"]
+        ); self.drop_choose_device.place(
+            x=200, y=45, width=170, height=30
+        ); self.drop_choose_device.config(
+            font=utils.FNT_FUTURA.c12
+        )
+        
+        self.drop_choose_device.state(["readonly"])
+        self.drop_choose_device.set("Select a Controller.")
+        self.drop_choose_device.bind("<<ComboboxSelected>>", on_select_choose_device)
+        
+        def tkafter_drop_choose_device() -> None:
+            values = []; devices = hid.enumerate()
+            for _, device in enumerate(devices):
+                product = device.get("product_string") or "N/A"
+                manufacturer = device.get("manufacturer_string") or "N/A"
+                values.append(f'{manufacturer} - {product}')
+            
+            self.drop_choose_device.config(values=values)
+            self.root.after(10, tkafter_drop_choose_device)
+        self.root.after(10, tkafter_drop_choose_device)
+        
+        self.lbl_choose_rgb = tk.Label(
+            self.root,
+            font=utils.FNT_FUTURA.c14,
+            bg=bg_col,
+            text="RGB Values",
+            fg="#FFFFFF"
+        ); self.lbl_choose_rgb.place(
+            x=15, y=85, width=180, height=40
+        )
+        
+        self.spin_rgb_r = tk.Spinbox(
+            self.root, from_=0, to=255, bg="#FF0000", font=utils.FNT_FUTURA.c14, fg="#FFFFFF"
+        ); self.spin_rgb_r.place(x=200, y=85, width=35, height=40)
+        
+        self.spin_rgb_g = tk.Spinbox(
+            self.root, from_=0, to=255, bg="#00FF00", font=utils.FNT_FUTURA.c14, fg="#FFFFFF"
+        ); self.spin_rgb_g.place(x=242, y=85, width=35, height=40)
+        
+        self.spin_rgb_b = tk.Spinbox(
+            self.root, from_=0, to=255, bg="#0000FF", font=utils.FNT_FUTURA.c14, fg="#FFFFFF"
+        ); self.spin_rgb_b.place(x=284, y=85, width=35, height=40)
+        
+
+        def on_btn_rgb_apply_press() -> bool:
+            r, g, b = self.spin_rgb_r.get(), self.spin_rgb_g.get(), self.spin_rgb_b.get()
+            
+            try:
+                ds4utils.send_led_report(
+                    currentdevice,
+                    r, g, b
+                )
+            except Exception as e:
+                messagebox.showerror("--DS4MENU", f"Couldn't set RGB: {e}")
+                
+        self.btn_rgb_apply = tk.Button(
+            self.root, bg="#D027E6", font=utils.FNT_FUTURA.c10, fg="#000000",
+            text="APPLY", highlightthickness=0, command=on_btn_rgb_apply_press
+        ); self.btn_rgb_apply.place(x=325, y=85, width=45, height=40)
+
+    def destroy(self, code=0):
+        """completely stops everything"""
+        self.root.destroy()
+        exit(code=code)
+
+def main() -> None:
+    # add whatever here
+    ds4 = Ds4()
+    ds4.run_gui()
+    
+    # wait until user closes
+    
+    while 1: time.sleep(1) 
 
 if __name__ == "__main__":
     main()

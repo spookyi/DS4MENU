@@ -1,0 +1,32 @@
+import tkinter as tk
+
+class on_bind:
+    def select(event):
+        event.widget.selection_clear()
+        event.widget.icursor(tk.END)
+
+class FNT_FUTURA:
+    c8 = ("Futura", 8)
+    c10 = ("Futura", 10)
+    c11 = ("Futura", 11)
+    c12 = ("Futura", 12)
+    c13 = ("Futura", 13)
+    c14 = ("Futura", 14)
+    c15 = ("Futura", 15)
+    c16 = ("Futura", 16)
+    c17 = ("Futura", 17)
+    c18 = ("Futura", 18)
+    c19 = ("Futura", 19)
+    c20 = ("Futura", 20)
+    c21 = ("Futura", 21)
+    c22 = ("Futura", 22)
+    c23 = ("Futura", 23)
+    c24 = ("Futura", 24)
+    c25 = ("Futura", 25)
+    c26 = ("Futura", 26)
+    c27 = ("Futura", 27)
+    c28 = ("Futura", 28)
+    c29 = ("Futura", 29)
+    c30 = ("Futura", 30)
+    c31 = ("Futura", 31)
+    c32 = ("Futura", 32)
