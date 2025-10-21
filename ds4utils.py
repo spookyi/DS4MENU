@@ -15,6 +15,7 @@ def list_devices():
         if isinstance(path, bytes):
             path = path.decode()
         print(f"{i:3d}    {vid:04x}   {pid:04x}   {path}   {manu:18.18}   {prod}")
+        print(devices)
     return devices
 
 def open_device_by_index(devices, idx):

@@ -1,3 +1,10 @@
+import tkinter as tk
+
+class on_bind:
+    def select(event):
+        event.widget.selection_clear()
+        event.widget.icursor(tk.END)
+
 class FNT_FUTURA:
     c8 = ("Futura", 8)
     c10 = ("Futura", 10)
