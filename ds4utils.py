@@ -28,7 +28,7 @@ def open_device_by_index(devices, idx):
     device.open_path(path)
     return device
 
-def send_led_report(device, r, g, b, small_motor=0, large_motor=0, flash_on=0, flash_off=0):
+def send_led_report(device, r=0, g=0, b=0, small_motor=0, large_motor=0, flash_on=0, flash_off=0):
     """
     Send a proper USB DS4 LED report (Report ID 0x05, 32 bytes total).
     """
@@ -43,10 +43,7 @@ def send_led_report(device, r, g, b, small_motor=0, large_motor=0, flash_on=0, f
         flash_off,   # Flash off
     ] + [0x00] * (32 - 9)  # Pad 32 bytes
     
-    try:
-        device.write(bytearray(report))
-    except Exception as e:
-        print("Failed to send report:", e)
+    device.write(bytearray(report))
 
 
 

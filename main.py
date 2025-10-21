@@ -117,16 +117,33 @@ class Ds4:
         )
         
         self.spin_rgb_r = tk.Spinbox(
-            self.root, from_=0, to=255, bg="#FF0000", font=utils.FNT_FUTURA.c12
-        ); self.spin_rgb_r.place(x=200, y=85, width=40, height=40)
+            self.root, from_=0, to=255, bg="#FF0000", font=utils.FNT_FUTURA.c14, fg="#FFFFFF"
+        ); self.spin_rgb_r.place(x=200, y=85, width=35, height=40)
         
         self.spin_rgb_g = tk.Spinbox(
-            self.root, from_=0, to=255, bg="#00FF00", font=utils.FNT_FUTURA.c12
-        ); self.spin_rgb_g.place(x=240, y=85, width=40, height=40)
+            self.root, from_=0, to=255, bg="#00FF00", font=utils.FNT_FUTURA.c14, fg="#FFFFFF"
+        ); self.spin_rgb_g.place(x=242, y=85, width=35, height=40)
         
         self.spin_rgb_b = tk.Spinbox(
-            self.root, from_=0, to=255, bg="#0000FF", font=utils.FNT_FUTURA.c12
-        ); self.spin_rgb_b.place(x=280, y=85, width=40, height=40)
+            self.root, from_=0, to=255, bg="#0000FF", font=utils.FNT_FUTURA.c14, fg="#FFFFFF"
+        ); self.spin_rgb_b.place(x=284, y=85, width=35, height=40)
+        
+
+        def on_btn_rgb_apply_press() -> bool:
+            r, g, b = self.spin_rgb_r.get(), self.spin_rgb_g.get(), self.spin_rgb_b.get()
+            
+            try:
+                ds4utils.send_led_report(
+                    currentdevice,
+                    r, g, b
+                )
+            except Exception as e:
+                messagebox.showerror("--DS4MENU", f"Couldn't set RGB: {e}")
+                
+        self.btn_rgb_apply = tk.Button(
+            self.root, bg="#D027E6", font=utils.FNT_FUTURA.c10, fg="#000000",
+            text="APPLY", highlightthickness=0, command=on_btn_rgb_apply_press
+        ); self.btn_rgb_apply.place(x=325, y=85, width=45, height=40)
 
     def destroy(self, code=0):
         """completely stops everything"""
