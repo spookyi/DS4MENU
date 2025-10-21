@@ -2,7 +2,7 @@
 
 # DS4MENU ⭐ [W.I.P]
 
-**DS4MENU** is a python-based project where you can mod and customize your ***DualShock4 Controller***. It also supports unnoficial controllers ***(*** __unstable__ ***)***
+**DS4MENU** is a python-based project where you can mod and customize your ***DualShock4 Controller***. It also supports unnoficial controllers ***(__unstable__)***
 
 ## Installation
 You can download the Z.I.P File from GitHub, or you can install it with [Git](https://git-scm.com)
